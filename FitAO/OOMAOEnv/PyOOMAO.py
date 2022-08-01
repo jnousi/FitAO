@@ -242,6 +242,8 @@ class PyOOMAO(gym.Env):
             self.dm_params,
             self.delay,
         ) = parse_file(self.param_file, "matlab")
+        # TODO: After parameter_parser change, responsibility for converting float
+        # lists to matlab format will pass to this function
 
         # Unit conversion
         if "npix" in self.wfs_params:

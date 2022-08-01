@@ -1,0 +1,56 @@
+simul_name: "bench_scao_sh_16x16_16pix"
+
+loop:
+  niter: 1000
+  ittime: 0.002
+
+geom:
+  zenithangle: 0.0
+  pupdiam: 256
+
+tel:
+  diam: 8.0
+  cobs: 0.12
+
+atmos:
+  r0: 0.15
+  nscreens: 4
+  frac: [0.5, 0.2, 0.2, 0.1]
+  alt: [0.0, 4499.0, 4500.0, 9000.0]
+  windspeed: [10.0, 20.0, 15.0, 10.0]
+  winddir: [0.0, 45.0, 90.0, 30.0]
+  L0: [25.0, 25.0, 25.0, 25.0]
+
+target:
+- xpos: 0.0
+  ypos: 0.0
+  Lambda: 1.65
+  mag: 10.0
+- xpos: 0.0
+  ypos: 0.0
+  Lambda: 1.65
+  mag: 10.0
+
+wfs:
+  - type: sh
+    nxsub: 16
+    npix: 8
+    pixsize: 0.3
+    fracsub: 0.8
+    xpos: 0.0
+    ypos: 0.0
+    Lambda: 0.55
+    gsmag: 3
+    optthroughput: 0.5
+    zerop: 1.0e11
+    noise: 0
+    atmos_seen: 1
+
+dm:
+  - type: pzt
+    nact: 17 # nxsub + 1 ei toimi
+    alt: 0.0
+    thresh: 0.3
+    coupling: 0.2
+    unitpervolt: 0.01
+    push4imat: 100
