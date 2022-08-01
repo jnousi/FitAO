@@ -11,13 +11,13 @@ param_file = "./Conf/sh_16x8.py"
 # env3.set_params_file(param_file)
 env2 = CompassEnv()
 S2 = env2.set_params_file(param_file)
-#env = soapyEnv()
-#env.set_params_file(param_file)
-#S = env.get_imat()
+# env = soapyEnv()
+# env.set_params_file(param_file)
+# S = env.get_imat()
 
 # #imat_soa = tm.do_imat(env)
 # imat_com = tm.do_imat(env2)
-S2V = tm.do_cmat(env2,0.05)
+S2V = tm.do_cmat(env2, 0.05)
 # # imat_oom = tm.do_imat(env3)
 # #
 # # plt.imshow(imat_oom)

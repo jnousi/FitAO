@@ -17,7 +17,7 @@ param_file = "./Conf/sh_16x8.py"
 
 # RL env used to learn adaptive gain, you can replace the CompassEnv with both
 # soapyEnv and PyOOMAO
-env = AoGain(CompassEnv(),param_file)
+env = AoGain(CompassEnv(), param_file)
 
 # ----------------- Train model ------------------------------------------------
 
@@ -25,7 +25,7 @@ model = PPO2(MlpPolicy, env, verbose=1, tensorboard_log="./tensorboard_gain/")
 model.learn(total_timesteps=int(3e5))
 model.save("ppo2_AO")
 
-del model # remove to demonstrate saving and loading
+del model  # remove to demonstrate saving and loading
 
 # ----------------- Load and test model ----------------------------------------
 
@@ -46,7 +46,7 @@ model = PPO2.load("ppo2_AO")
 
 # -------- Parameters for comparison ------------------------------------------
 
-n = 500 #frames to compare
+n = 500  # frames to compare
 
 # ---------- Optimaze static gain ----------------------------------------------
 # opt_gain = 0
@@ -71,11 +71,11 @@ gains = []
 
 cur_gain = 0
 
-seed = np.random.randint(1,1000000)
+seed = np.random.randint(1, 1000000)
 
 tmp_s_str = []
 
-#Static gain
+# Static gain
 env.reset(seed)
 static_str = 0
 obs, rewards, dones, info = env.step(opt_gain)
@@ -87,18 +87,18 @@ for o in range(n):
         env.env.render()
         fig = matplotlib.pyplot.gcf()
         fig.set_size_inches(18.5, 10.5, forward=True)
-        plt.savefig("fitao_render.png", dpi=500,bbox_inches='tight')
+        plt.savefig("fitao_render.png", dpi=500, bbox_inches="tight")
         plt.close()
 
 
 tmp_a_str = []
 
-#Adaptive gain
+# Adaptive gain
 obs = env.reset(seed)
 adpt_str = 0
 for o in range(n):
     action, _states = model.predict(obs)
-    cur_gain = np.clip(cur_gain + action,0,1)
+    cur_gain = np.clip(cur_gain + action, 0, 1)
     gains.append(cur_gain)
     obs, rewards, dones, info = env.step(action)
     tmp_a_str.append(env.env.get_strehl())
@@ -106,17 +106,19 @@ for o in range(n):
 # ---------------  Plot the results --------------------------------------------
 
 plt.clf()
-plt.axhline(np.mean(tmp_s_str[40:]), label="Average static gain", color="r", linestyle="--")
+plt.axhline(
+    np.mean(tmp_s_str[40:]), label="Average static gain", color="r", linestyle="--"
+)
 plt.plot(tmp_a_str, label="Adaptive gain")
 
 plt.legend(loc="lower right")
-plt.xlabel('Frame number')
+plt.xlabel("Frame number")
 plt.ylabel("Strehl ratio")
 
 plt.savefig("fitao_strehl.png", dpi=1200)
 
 plt.clf()
-seaborn.histplot(np.asarray(gains),stat="probability",legend=False)
+seaborn.histplot(np.asarray(gains), stat="probability", legend=False)
 plt.xlabel("Chosen gain")
 plt.ylabel("Probability")
 plt.savefig("fitao_gain.png", dpi=1200)
