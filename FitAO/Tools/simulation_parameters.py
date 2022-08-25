@@ -16,16 +16,21 @@ Note:
     Internally, `SimulationParameters` and its attributes use the `pydantic`-package, which allows
     for very s
 """
+from __future__ import annotations
 from pydantic import (
     BaseModel,
     Extra,
     ValidationError,
     NonNegativeFloat,
     NonNegativeInt,
-    confloat,
+    root_validator,
 )
 from typing import Optional, List, Union
 
+
+def _alphanumeric_lowercase(field_name: str) -> str:
+    alias = ''.join(filter(str.isalnum, field_name))
+    return alias.lower()
 
 
 class Parameters(BaseModel):
@@ -33,91 +38,104 @@ class Parameters(BaseModel):
 
     This is the superclass which `SimulationParameters` and its attributes all inherit from.
     """
+    @root_validator(pre=True, allow_reuse=True)
+    def preprocess_field_names(cls, values):
+        new_values = {_alphanumeric_lowercase(k): v for (k, v) in values.items()}
+        return new_values
+
     class Config:
-        # Disallow parameters which are not explicitly listed, as each parameter needs to be individually supported
+        # Disallow parameters which are not explicitly listed. If they are needed, they can
+        # be passed to the Unsupported-class.
         extra = Extra.forbid
-        # Disallow changing attribute values after model creation, as this can inadvertently lead to
+
+        # Disallow changing attribute values after model creation.
         allow_mutation = False
+
+        # Enable using aliases for field names
+        allow_population_by_field_name = True
+
+        alias_generator = _alphanumeric_lowercase
 
 
 class Loop(Parameters):
-    niter: NonNegativeInt
-    ittime: NonNegativeFloat
+    n_iterations: NonNegativeInt
+    step_time: NonNegativeFloat
 
 
 class Geometry(Parameters):
-    zenithangle: float
-    pupdiam: NonNegativeFloat
+    zenith_angle: Optional[float]
+    pupil_diameter: Optional[NonNegativeFloat]
 
 
 class Telescope(Parameters):
-    diam: NonNegativeFloat
+    diameter: NonNegativeFloat
     cobs: NonNegativeFloat
 
 
 class Atmosphere(Parameters):
     r0: NonNegativeFloat
-    nscreens: NonNegativeInt
-    frac: List[NonNegativeFloat]
-    alt: List[float]
-    windspeed: List[float]
-    winddir: List[float]
+    n_screens: NonNegativeInt
+    fractional_r0: List[NonNegativeFloat]
+    altitude: List[float]
     L0: Union[NonNegativeFloat, List[NonNegativeFloat]]
+    wind_speed: Optional[List[float]]
+    wind_direction: Optional[List[float]]
 
 
 class Target(Parameters):
-    xpos: float
-    ypos: float
-    Lambda: NonNegativeFloat
-    mag: NonNegativeFloat
+    x_position: float
+    y_position: float
+    magnitude: NonNegativeFloat
+    Lambda: Optional[NonNegativeFloat]
 
 
 class GuideStar(Parameters):
     pass
 
 
-class WFS(Parameters):
+class WavefrontSensor(Parameters):
     type: str
-    nxsub: NonNegativeInt
-    npix: NonNegativeInt
-    pixsize: NonNegativeFloat
-    fracsub: NonNegativeFloat
-    xpos: float
-    ypos: float
-    Lambda: float  # TODO: Nonnegative?
-    gsmag: NonNegativeFloat
-    optthroughput: NonNegativeFloat
-    zerop: NonNegativeFloat
-    noise: NonNegativeFloat
-    atmos_seen: bool
+    x_subapertures: NonNegativeInt
+    n_pixels: NonNegativeInt
+    pixel_size: NonNegativeFloat
+    x_position: float
+    y_position: float
+    fracsub: Optional[NonNegativeFloat]
+    Lambda: Optional[float]  # TODO: Nonnegative?
+    guidestar_magnitude: Optional[NonNegativeFloat]
+    optical_throughput: Optional[NonNegativeFloat]
+    zerop: Optional[NonNegativeFloat]
+    noise: Optional[NonNegativeFloat]
+    atmosphere_seen: Optional[bool]
 
 
-class DM(Parameters):
+class DeformableMirror(Parameters):
     type: str
-    nact: NonNegativeInt
-    alt: float
-    thresh: NonNegativeFloat
-    coupling: NonNegativeFloat
-    unitpervolt: NonNegativeFloat
-    push4imat: NonNegativeFloat
+    n_actuators: NonNegativeInt
+    altitude: float
+    threshold: Optional[NonNegativeFloat]
+    coupling: Optional[NonNegativeFloat]
+    unit_per_volt: Optional[NonNegativeFloat]
+    push_for_interaction_matrix: Optional[NonNegativeFloat]
 
 
 class Centroider(Parameters):
-    nwfs: NonNegativeInt
     type: str
+    n_wavefront_sensors: NonNegativeInt
 
 
 class Controller(Parameters):
     type: str
-    nwfs: List[NonNegativeInt]
-    ndm: List[NonNegativeInt]
-    maxcond: NonNegativeFloat  # TODO: Not sure what this one is
+    n_wavefront_sensors: List[NonNegativeInt]
+    n_deformable_mirrors: List[NonNegativeInt]
     delay: NonNegativeInt
-    gain: NonNegativeFloat
-    modopti: bool
+    maxcond: Optional[NonNegativeFloat]  # TODO: Not sure what this one is
+    gain: Optional[NonNegativeFloat]
+    modopti: Optional[bool]
+
 
 class Unsupported(Parameters, extra=Extra.allow):
-    """Container for additional user parameters not officially supported.
+    """Container for extra parameters which aren't officially supported.
 
 
     """
@@ -125,17 +143,117 @@ class Unsupported(Parameters, extra=Extra.allow):
 
 
 class SimulationParameters(Parameters):
-    simul_name: str
-    loop: Loop
-    geom: Geometry
-    tel: Telescope
-    atmos: Atmosphere
-    target: List[Target]
-    gs: Optional[List[GuideStar]]
-    wfs: List[WFS]
-    dm: List[DM]
-    centroider: List[Centroider]
-    controller: List[Controller]
-    # data: Unsupported
+    simulation_name: Optional[str]
+    loop: Optional[Loop]
+    geometry: Optional[Geometry]
+    telescope: Optional[Telescope]
+    atmosphere: Optional[Atmosphere]
+    target: Optional[List[Target]]
+    guidestar: Optional[List[GuideStar]]
+    wavefront_sensor: Optional[List[WavefrontSensor]]
+    deformable_mirror: Optional[List[DeformableMirror]]
+    centroider: Optional[List[Centroider]]
+    controller: Optional[List[Controller]]
+    extra_data: Optional[Unsupported]
 
-    def
+
+# TODO: Maybe add some automation here, like automatically adding plurals
+# Consider moving this into another file with a cleaner implementation
+
+field_name_aliases = {
+    'SimulationParameters': [
+        ['simulation_name', 'simulation_name', 'sim_name', 'simul_name'],
+        ['loop', 'iteration'],
+        ['geometry', 'geom'],
+        ['telescope', 'tel'],
+        ['atmosphere', 'atm', 'atmos'],
+        ['target', 'tar', 'tars', 'targets'],
+        ['guidestar', 'gs', 'gss', 'guidestars'],
+        ['wavefront_sensor', 'wfs', 'wfss', 'wavefront_sensors'],
+        ['deformable_mirror', 'dm', 'dms', 'deformable_mirrors'],
+        ['centroider', 'centroiders'],
+        ['controller', 'controllers'],
+        ['extra_data', 'extra', 'extras', 'unsupported'],
+    ],
+
+    'Loop': [
+        ['n_iterations', 'n_iter', 'n_iters', 'n_iterations'],
+        ['step_time', 'it_time', 'iteration_time'],
+    ],
+
+    'Geometry': [
+        ['zenith_angle', 'zenith'],
+        ['pupil_diameter', 'pup_diam', 'pupil_diam', 'diam', 'diameter'],
+    ],
+
+    'Telescope': [
+        ['diameter', 'diam'],
+        ['cobs', ],
+    ],
+
+    'Atmosphere': [
+        ['r0', 'fried'],
+        ['n_screens', 'n_screen', 'n_layers', 'n_layer'],
+        ['fractional_r0', 'frac', 'fractional'],
+        ['altitude', 'alt', 'alts', 'altitudes', 'height', 'heights'],
+        ['L0', 'outer_scale'],
+        ['wind_speed', 'wind_speeds'],
+        ['wind_direction', 'wind_dir', 'wind_dirs', 'wind_directions'],
+    ],
+
+    'Target': [
+        ['x_position', 'x_pos', 'x_coord', 'x_coordinate', 'x_loc', 'x_location'],
+        ['y_position', 'y_pos', 'y_coord', 'y_coordinate', 'y_loc', 'y_location'],
+        ['magnitude', 'mag'],
+        ['Lambda', ],
+    ],
+
+    'GuideStar': [
+
+    ],
+
+    'WavefrontSensor': [
+        ['type', ],
+        ['x_subapertures', 'x_sub', 'x_subs', 'x_subaps', 'sub', 'subs', 'subaps', 'subapertures'],
+        ['n_pixels', 'n_pix', 'n_pixel'],
+        ['pixel_size', 'pix_size'],
+        ['x_position', 'x_pos', 'x_coord', 'x_coordinate', 'x_loc', 'x_location'],
+        ['y_position', 'y_pos', 'y_coord', 'y_coordinate', 'y_loc', 'y_location'],
+        ['fracsub', ],
+        ['Lambda', ],
+        ['guidestar_magnitude', 'mag', 'magnitude', 'gs_mag'],
+        ['optical_throughput', 'opt_throughput'],
+        ['zerop', ],
+        ['noise', ],
+        ['atmosphere_seen', 'atm_seen', 'atmos_seen'],
+    ],
+
+    'DeformableMirror': [
+        ['type', ],
+        ['n_actuators', 'n_act', 'n_acts', 'n_actuator', 'act', 'acts', 'actuator', 'actuators'],
+        ['altitude', ],
+        ['threshold', ],
+        ['coupling', ],
+        ['unit_per_volt', ],
+        ['push_for_interaction_matrix', ],
+    ],
+
+    'Centroider': [
+        ['n_wavefront_sensors', ],
+        ['type', ],
+    ],
+
+    'Controller': [
+        ['type', ],
+        ['n_wavefront_sensors', ],
+        ['n_deformable_mirrors', ],
+        ['delay', ],
+        ['maxcond', ],
+        ['gain', ],
+        ['modopti', ],
+    ],
+
+    'Unsupported': [
+
+    ]
+}
