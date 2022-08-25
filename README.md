@@ -84,17 +84,17 @@ import Tools.control as ctr
 
 param_file = "/Conf/sh_16x8.py"
 env = CompassEnv()
-controller = ctr.control(skip_WFS=False)
+controller = ctr.Control(skip_WFS=False)
 
 valid = env.set_params_file(param_file)
 
 if valid:
     obs = env.reset()
-    controller.do_matrices(env,forceNew = False)
+    controller.do_matrices(env, forceNew=False)
 
     for step in range(1000):
         env.render()
-        action = controller.closed_loop(obs,gain = 0.6)
+        action = controller.closed_loop(obs, gain=0.6)
         obs, reward, done, info = env.step(action)
 
 env.close()
@@ -116,23 +116,23 @@ envs.append(CompassEnv())
 envs.append(PyOOMAO())
 envs.append(soapyEnv())
 
-controller = ctr.control(skip_WFS=False)
+controller = ctr.Control(skip_WFS=False)
 
 for env in envs:
-    valid = env.set_params_file(param_file,forceNew = False)
+    valid = env.set_params_file(param_file, forceNew=False)
     if valid:
-    	obs = env.reset()
-    	controller.do_matrices(env)
+        obs = env.reset()
+        controller.do_matrices(env)
 
-    	for step in range(1000):
-        	env.render()
-    
-        	action = controller.closed_loop(obs,gain = 0.6)
-        	obs, reward, done, info = env.step(action)
+        for step in range(1000):
+            env.render()
 
-    	controller.reset()
+            action = controller.closed_loop(obs, gain=0.6)
+            obs, reward, done, info = env.step(action)
 
-    	env.close()
+        controller.reset()
+
+        env.close()
 ```
 
 

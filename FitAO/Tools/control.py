@@ -1,9 +1,8 @@
-import numpy as np
 import time
-from .mat import *
+from FitAO.Tools.mat import *
 
 
-class control:
+class Control:
     def __init__(self, skip_WFS=False):
         # skip_WFS allows reading wavefronts directly instead of approximating
         # it by using a WFS.
@@ -149,3 +148,7 @@ class control:
 
     def get_infmat(self):
         return self.infmat
+
+
+# Backwards compatibility for refactored class name
+control = Control

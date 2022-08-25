@@ -1,6 +1,5 @@
 import numpy as np
 import tqdm
-import time
 import matplotlib.pyplot as plt
 
 # Tools for creating interaction and control matrices
@@ -19,20 +18,20 @@ def do_imat(env, modal=None):  # OOMAO method for imat generation
     n_validact = env.action_space.sample().shape[0]
 
     if modal is None:
-        calibDmCommands = env.get_calibConst() * np.identity(n_validact)
+        calibration_dm_commands = env.get_calibConst() * np.identity(n_validact)
     else:
-        calibDmCommands = env.get_calibConst() * modal
+        calibration_dm_commands = env.get_calibConst() * modal
 
-    D = np.zeros((env.observation_space.sample().shape[0], calibDmCommands.shape[0]))
+    D = np.zeros((env.observation_space.sample().shape[0], calibration_dm_commands.shape[0]))
     print("Doing imat...")
     env.step(np.zeros(n_validact), showAtmos=False)
     for i in tqdm.tqdm(
-        range(calibDmCommands.shape[0])
+        range(calibration_dm_commands.shape[0])
     ):  # tqdm used to create progress bar
         for j in range(2):  # To compensate 1 frame lag of wfs sensor
-            slopes_push = env.step(calibDmCommands[i, :], showAtmos=False)[0]
+            slopes_push = env.step(calibration_dm_commands[i, :], showAtmos=False)[0]
         for j in range(2):
-            slopes_pull = env.step(-1 * calibDmCommands[i, :], showAtmos=False)[0]
+            slopes_pull = env.step(-1 * calibration_dm_commands[i, :], showAtmos=False)[0]
         D[:, i] = 0.5 * (np.asarray(slopes_push) - np.asarray(slopes_pull))
         # print(D[:,i])
         # env.render()

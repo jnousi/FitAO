@@ -34,7 +34,7 @@ import tqdm
 
 param_files = ["./Conf/sh_16x8.py", "./Conf/sh_16x8_lgs.py", "./Conf/pyrhr_16x16.py"]
 
-controller = ctr.control()
+controller = ctr.Control()
 
 for env in envs:
     for param_file in param_files:

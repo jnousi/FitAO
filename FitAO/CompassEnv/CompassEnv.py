@@ -4,9 +4,9 @@ import os
 from shesha.supervisor.compassSupervisor import CompassSupervisor as Supervisor
 from shesha.config import ParamConfig
 from shesha.supervisor.optimizers.modalBasis import ModalBasis
-import matplotlib.pyplot as plt
+import matplotlib.pyplot as plot
 import numpy as np
-from skimage.transform import resize
+from skimage.transform import resize  # TODO: Is this dependency really worth it?
 
 
 class CompassEnv(gym.Env):
@@ -79,53 +79,53 @@ class CompassEnv(gym.Env):
         rows = int(rows)
         col = int(col)
 
-        plt.clf()
+        plot.clf()
 
         for i in range(n_wfs):
-            plt.subplot(rows, col, i + 1)
-            plt.imshow(self.get_phase_screen(i))
-            plt.title("WFS " + str(i) + " residual phase")
+            plot.subplot(rows, col, i + 1)
+            plot.imshow(self.get_phase_screen(i))
+            plot.title("WFS " + str(i) + " residual phase")
 
         for i in range(n_dm):
-            plt.subplot(rows, col, i + n_wfs + 1)
-            plt.imshow(self.get_dm_shape(i))
-            plt.title("DM " + str(i) + " shape")
+            plot.subplot(rows, col, i + n_wfs + 1)
+            plot.imshow(self.get_dm_shape(i))
+            plot.title("DM " + str(i) + " shape")
 
         for i in range(n_atm):
             if i == 0:
                 atm_screen = resize(self.supervisor.atmos.get_atmos_layer(i), (128, 128))
             else:
                 atm_screen += resize(self.supervisor.atmos.get_atmos_layer(i), (128, 128))
-        plt.subplot(rows, col, n_wfs + n_dm + 1)
-        plt.imshow(atm_screen)
-        plt.title("Atmos")
+        plot.subplot(rows, col, n_wfs + n_dm + 1)
+        plot.imshow(atm_screen)
+        plot.title("Atmos")
 
-        plt.subplot(rows, col, n_wfs + n_dm + 2)
-        plt.imshow(
+        plot.subplot(rows, col, n_wfs + n_dm + 2)
+        plot.imshow(
             self.supervisor.target.get_tar_image(0, expo_type="se")
         )  # expo_type = "le" for long exposure
-        plt.xlim(465, 565)
-        plt.ylim(465, 565)
-        plt.title("Image")
+        plot.xlim(465, 565)
+        plot.ylim(465, 565)
+        plot.title("Image")
 
-        plt.subplot(rows, col, n_wfs + n_dm + 3)
+        plot.subplot(rows, col, n_wfs + n_dm + 3)
         if self.supervisor.config.p_wfss[0].get_type() == "pyrhr":
-            plt.imshow(self.supervisor.wfs.get_pyrhr_image(0))
+            plot.imshow(self.supervisor.wfs.get_pyrhr_image(0))
         else:
-            plt.imshow(self.supervisor.wfs.get_wfs_image(0))
-        plt.title("Raw WFS image")
+            plot.imshow(self.supervisor.wfs.get_wfs_image(0))
+        plot.title("Raw WFS image")
 
-        plt.setp(
-            plt.gcf().get_axes(), xticks=[], yticks=[]
+        plot.setp(
+            plot.gcf().get_axes(), xticks=[], yticks=[]
         )  # Remove axis ticks for readability
-        plt.suptitle("Compass", fontsize=14)
+        plot.suptitle("Compass", fontsize=14)
 
-        plt.draw()
-        plt.pause(1e-3)  # Pause for plotting to work
+        plot.draw()
+        plot.pause(1e-3)  # Pause for plotting to work
 
     def close(self):
         self.supervisor.reset()
-        plt.close()
+        plot.close()
         del self.supervisor
 
     # ---------------- Simulation initialisation functions ---------------------

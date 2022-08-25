@@ -1,6 +1,6 @@
 import matlab.engine
 import gym
-from gym import error, spaces
+from gym import spaces
 import numpy as np
 import matlab
 import matplotlib.pyplot as plt
@@ -8,10 +8,10 @@ import time
 import os
 import io
 import sys
-from Tools.ParamParser import *
+from FitAO.Tools.ParamParser import parse_file
 
 
-class PyOOMAO(gym.Env):
+class OOMAOEnv(gym.Env):
     metadata = {"render.modes": ["rgb_array"]}
 
     # --------------------------Core gym funtions--------------------------------
@@ -23,7 +23,7 @@ class PyOOMAO(gym.Env):
                 self.eng.cd(
                     os.getcwd() + "/OOMAOEnv"
                 )  # Change matlab folder to OOMAO env folder
-            except:
+            except Exception:
                 print("PyOOMAO files not found!")
 
         self.env = self.eng.env(nargout=1, stdout=io.StringIO())
@@ -102,7 +102,7 @@ class PyOOMAO(gym.Env):
         except KeyboardInterrupt:
             print("Ok ok, quitting")
             sys.exit(1)
-        except:
+        except Exception:
             print("Cant render")
 
     def reset(self, seed=-1):  # -1 random seed (default), > 0 set seed
@@ -437,3 +437,7 @@ class PyOOMAO(gym.Env):
     def sample_binary_noise(self, sigma):
         noise = self.F @ (sigma * np.sign(np.random.normal(0, 1, size=(self.n_actions,))))
         return self.vec_to_img(noise)
+
+
+# Alternate class name for backwards compatibility
+PyOOMAO = OOMAOEnv

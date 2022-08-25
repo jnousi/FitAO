@@ -3,14 +3,14 @@ from gym import spaces
 
 try:
     from .soapy2.soapy.simulation import Sim
-except:
+except ImportError:
     from soapy2.soapy.simulation import Sim
+
 import matplotlib.pyplot as plt
 import numpy as np
 import time
 import os
-import sys
-from Tools.ParamParser import *
+from FitAO.Tools.ParamParser import parse_file
 
 
 class SoapyEnv(gym.Env):

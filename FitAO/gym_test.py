@@ -22,7 +22,7 @@ param_file = (
 )
 
 env = PyOOMAO()  # AO enviroment object
-controller = ctr.control(skip_WFS=False)
+controller = ctr.Control(skip_WFS=False)
 env.set_params_file(param_file)  # sets env parameter file
 
 controller.do_matrices(env, forceNew=False)
