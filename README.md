@@ -1,5 +1,9 @@
 # FitAO
 
+> :warning: **Warning**: This package is currently a work-in-progress! You are more than welcome to try it out, but be 
+> aware that the interface (especially the way that simulation parameters are defined) is subject to change, and that
+> the package has not yet been thoroughly tested.
+
 FitAO is a unified Python interface for multiple AO simulators. Currently it supports [Compass](https://anr-compass.github.io/compass/), [OOMAO](https://github.com/rconan/OOMAO) and [Soapy](https://github.com/AOtools/soapy). The interface follows [OpenAI Gyms](https://github.com/openai/gym) model for [enviroments](https://gym.openai.com/docs/#environments).
 
 ## TOC
