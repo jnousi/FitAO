@@ -6,7 +6,7 @@ except ModuleNotFoundError:
         + "Shesa modules not found. Try running '. ./env_var.sh' first!"
         + "\x1b[0m"
     )
-from OOMAOEnv.PyOOMAO import PyOOMAO
+from OOMAOEnv.OOMAOEnv import OOMAOEnv
 from SoapyEnv.SoapyEnv import SoapyEnv
 import Tools.mat as tm
 import Tools.control as ctr
@@ -21,7 +21,7 @@ param_file = (
     "./Conf/sh_16x8.py"  # Path to Compass param file, . in front means relative import.
 )
 
-env = PyOOMAO()  # AO enviroment object
+env = OOMAOEnv()  # AO enviroment object
 controller = ctr.Control(skip_WFS=False)
 env.set_params_file(param_file)  # sets env parameter file
 

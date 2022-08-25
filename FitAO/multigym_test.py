@@ -1,5 +1,5 @@
 from CompassEnv.CompassEnv import CompassEnv
-from OOMAOEnv.PyOOMAO import PyOOMAO
+from OOMAOEnv.OOMAOEnv import OOMAOEnv
 from SoapyEnv.SoapyEnv import SoapyEnv
 import numpy as np
 import time
@@ -19,7 +19,7 @@ r0_max = 15
 env1 = CompassEnv()  # Compass enviroment object
 envs.append(env1)
 
-env2 = PyOOMAO()  # OOMAO enviroment object
+env2 = OOMAOEnv()  # OOMAO enviroment object
 envs.append(env2)
 
 env3 = soapyEnv()  # Soapy enviroment object

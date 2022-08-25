@@ -6,7 +6,7 @@ from shesha.config import ParamConfig
 from shesha.supervisor.optimizers.modalBasis import ModalBasis
 import matplotlib.pyplot as plot
 import numpy as np
-from skimage.transform import resize  # TODO: Is this dependency really worth it?
+from skimage.transform import resize
 
 
 class CompassEnv(gym.Env):

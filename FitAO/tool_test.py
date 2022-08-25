@@ -1,5 +1,5 @@
 from CompassEnv.CompassEnv import CompassEnv
-from OOMAOEnv.PyOOMAO import PyOOMAO
+from OOMAOEnv.OOMAOEnv import OOMAOEnv
 from SoapyEnv.SoapyEnv import SoapyEnv
 import Tools.mat as tm
 import matplotlib.pyplot as plt

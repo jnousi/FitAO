@@ -1,6 +1,6 @@
 import gym
 from CompassEnv.CompassEnv import CompassEnv
-from OOMAOEnv.PyOOMAO import PyOOMAO
+from OOMAOEnv.OOMAOEnv import OOMAOEnv
 from SoapyEnv.SoapyEnv import SoapyEnv
 from Tools.rl_gain import AoGain
 import numpy as np

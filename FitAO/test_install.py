@@ -12,9 +12,9 @@ except ModuleNotFoundError:
     )
 
 try:
-    from OOMAOEnv.PyOOMAO import PyOOMAO
+    from OOMAOEnv.OOMAOEnv import OOMAOEnv
 
-    envs.append(PyOOMAO())
+    envs.append(OOMAOEnv())
 except ModuleNotFoundError:
     print("\033[93m" + "PyOOMAO not found." + "\x1b[0m")
 
