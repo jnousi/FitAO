@@ -281,7 +281,7 @@ class CompassEnv(gym.Env):
         return self.supervisor.rtc.get_slopes(0)
 
     def _get_reward(self, slopes, type="volt"):
-        if self.S2V is not None and type is not "sh":
+        if self.S2V is not None and type != "sh":
             res_volt = np.matmul(self.S2V, slopes)
             reward = -1 * np.linalg.norm(res_volt)
         else:
