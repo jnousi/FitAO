@@ -1,2 +1,6 @@
+include LICENSE
+include README.md
+include pyproject.toml
+include FitAO/*.sh
 include FitAO/*.toml
 include FitAO/*.m

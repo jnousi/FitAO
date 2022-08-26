@@ -19,12 +19,20 @@ classifiers = [
     "Operating System :: OS Independent",
     "Topic :: Scientific/Engineering :: Astronomy",
 ]
-
-# TODO: Add dependencies and authors
+# TODO: Missing authors
+# We may need to add version requirements
+dependencies = [
+    "gym", # OpenAI Gym, a standard API for reinforcement learning, will likely become optional in the future
+    "matplotlib",
+    "numpy",
+    "scikit-image",  # TODO: Currently only used by CompassEnv, maybe unnecessary
+    "tqdm",  # Light-weight progress bar for lengthy computations
+    "pydantic"  # Robust data validation tool for checking user-provided parameter files
+]
+[optional-dependencies]
+tests = [  # Any dependencies for tests will go here
+]
 
 [project.urls]
 "Homepage" = "https://github.com/jnousi/FitAO"
 "Bug Tracker" = "https://github.com/jnousi/FitAO/issues"
-
-[tool.setuptools.packages.find]
-where = "FitAO"
