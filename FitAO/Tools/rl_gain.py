@@ -3,7 +3,7 @@ from gym import error, spaces
 from gym import utils
 from gym.utils import seeding
 import numpy as np
-from .mat import do_cmat
+from FitAO.Tools.mat import do_cmat
 
 # Simple showcase how the gym enviroments can be used to generate a general
 # class used for RL problems. __init__ env input can be any of the AO gym

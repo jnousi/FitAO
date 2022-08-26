@@ -69,7 +69,7 @@ class Geometry(Parameters):
 
 class Telescope(Parameters):
     diameter: NonNegativeFloat
-    cobs: NonNegativeFloat
+    obstruction_ratio: NonNegativeFloat
 
 
 class Atmosphere(Parameters):
@@ -86,13 +86,14 @@ class Target(Parameters):
     x_position: float
     y_position: float
     magnitude: NonNegativeFloat
-    Lambda: Optional[NonNegativeFloat]
+    wavelength: Optional[NonNegativeFloat]
 
 
 class GuideStar(Parameters):
     pass
 
 
+# TODO: Some of these params should probably be under GuideStar, and WFS may need a GuideStar field
 class WavefrontSensor(Parameters):
     type: str
     x_subapertures: NonNegativeInt
@@ -101,12 +102,19 @@ class WavefrontSensor(Parameters):
     x_position: float
     y_position: float
     fracsub: Optional[NonNegativeFloat]
-    Lambda: Optional[float]  # TODO: Nonnegative?
+    wavelength: Optional[float]  # TODO: Nonnegative?
+    altitude: Optional[float]
+    lltx: Optional[float]  # Not sure what these are
+    llty: Optional[float]
     guidestar_magnitude: Optional[NonNegativeFloat]
     optical_throughput: Optional[NonNegativeFloat]
     zerop: Optional[NonNegativeFloat]
     noise: Optional[NonNegativeFloat]
     atmosphere_seen: Optional[bool]
+    fssize: Optional[float]
+    modulation_amplitude: Optional[float]  # pyr_amp
+    pyr_pup_sep: Optional[float]
+    pyr_npts: Optional[float]
 
 
 class DeformableMirror(Parameters):
@@ -116,7 +124,7 @@ class DeformableMirror(Parameters):
     threshold: Optional[NonNegativeFloat]
     coupling: Optional[NonNegativeFloat]
     unit_per_volt: Optional[NonNegativeFloat]
-    push_for_interaction_matrix: Optional[NonNegativeFloat]
+    calibration_constant: Optional[NonNegativeFloat]
 
 
 class Centroider(Parameters):
@@ -183,12 +191,12 @@ field_name_aliases = {
 
     'Geometry': [
         ['zenith_angle', 'zenith'],
-        ['pupil_diameter', 'pup_diam', 'pupil_diam', 'diam', 'diameter'],
+        ['pupil_diameter', 'pup_diam', 'pupil_diam'],
     ],
 
     'Telescope': [
         ['diameter', 'diam'],
-        ['cobs', ],
+        ['obstruction_ratio', 'obs_ratio', 'cobs', ],
     ],
 
     'Atmosphere': [
@@ -205,7 +213,7 @@ field_name_aliases = {
         ['x_position', 'x_pos', 'x_coord', 'x_coordinate', 'x_loc', 'x_location'],
         ['y_position', 'y_pos', 'y_coord', 'y_coordinate', 'y_loc', 'y_location'],
         ['magnitude', 'mag'],
-        ['Lambda', ],
+        ['wavelength', 'lambda',],
     ],
 
     'GuideStar': [
@@ -220,12 +228,19 @@ field_name_aliases = {
         ['x_position', 'x_pos', 'x_coord', 'x_coordinate', 'x_loc', 'x_location'],
         ['y_position', 'y_pos', 'y_coord', 'y_coordinate', 'y_loc', 'y_location'],
         ['fracsub', ],
-        ['Lambda', ],
+        ['wavelength', 'lambda'],
+        ['alt', 'altitude', 'gs_alt', 'gs_altitude', 'guidestar_altitude'],
+        ['lltx'],
+        ['llty'],
         ['guidestar_magnitude', 'mag', 'magnitude', 'gs_mag'],
         ['optical_throughput', 'opt_throughput'],
         ['zerop', ],
         ['noise', ],
         ['atmosphere_seen', 'atm_seen', 'atmos_seen'],
+        ['fssize', ],
+        ['pyr_amp', ],
+        ['pyr_pup_sep', ],
+        ['pyr_npts', ],
     ],
 
     'DeformableMirror': [
@@ -235,7 +250,7 @@ field_name_aliases = {
         ['threshold', ],
         ['coupling', ],
         ['unit_per_volt', ],
-        ['push_for_interaction_matrix', ],
+        ['calibration_constant', 'push4imat', ],
     ],
 
     'Centroider': [

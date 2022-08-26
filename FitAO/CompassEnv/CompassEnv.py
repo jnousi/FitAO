@@ -1,6 +1,5 @@
 import gym
 from gym import spaces
-import os
 from shesha.supervisor.compassSupervisor import CompassSupervisor as Supervisor
 from shesha.config import ParamConfig
 from shesha.supervisor.optimizers.modalBasis import ModalBasis
