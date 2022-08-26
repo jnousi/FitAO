@@ -50,10 +50,12 @@ def parse_parameter_file(file_path: str) -> SimulationParameters:
         logger.exception(f'Trying to open parameter file {file_path} produced an error.')
         raise FitAOParameterFileReadError(file_path) from error
     except tomllib.TOMLDecodeError as error:
+        # TODO: TOML produces a very unhelpful error if the same section is in the file twice,
+        # which is a fairly likely scenario for new users if they don't realise that you need
+        # e.g. [[wavefrontsensor]] rather than [wavefrontsensor]
         logger.exception(f'Trying to parse parameter file {file_path} as a TOML-file produced an '
                          f'error.')
         raise FitAOParameterFileParseError(file_path) from error
-
     try:
         data = SimulationParameters.parse_obj(data)
     except pydantic.ValidationError as error:

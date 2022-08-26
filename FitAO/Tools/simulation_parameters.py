@@ -20,13 +20,18 @@ from __future__ import annotations
 from pydantic import (
     BaseModel,
     Extra,
-    ValidationError,
     NonNegativeFloat,
     NonNegativeInt,
+    validator,
     root_validator,
 )
+from pydantic.typing import get_origin
 from typing import Optional, List, Union
+import logging
+from inspect import isclass
 
+
+logger = logging.getLogger(__name__)
 
 def _alphanumeric_lowercase(field_name: str) -> str:
     alias = ''.join(filter(str.isalnum, field_name))
@@ -163,6 +168,40 @@ class SimulationParameters(Parameters):
     centroider: Optional[List[Centroider]]
     controller: Optional[List[Controller]]
     extra_data: Optional[Unsupported]
+
+    @validator('*', pre=True, allow_reuse=True)
+    def _convert_to_list(cls, value, field):
+        """Checks if fields expecting a list are given a list element instead.
+
+        Fields which expect lists of `Parameters`-objects can be a bit unintuitive when
+        it comes to the TOML-specification, since the parameter file sections need double
+        brackets, e.g. [[target]]. If the user has entered it as [target] instead, this
+        function will allow it to still be accepted by converting it to a list, while also
+        warning the user that using single brackets may result in an error.
+        """
+        # If value is already a list, we don't need to do anything.
+        if isinstance(value, list):
+            return value
+
+        # Skip fields which don't expect a list. field.outer_type_ gives the field
+        # type definition (with Optional removed), and get_origin gives the outer-most
+        # type in that type definition, which should be list
+        if get_origin(field.outer_type_) is not list:
+            return value
+
+        # Skip fields which expect a list of something other than a subclass of Parameters
+        if not isclass(field.type_) or not issubclass(field.type_, Parameters):
+            return value
+
+        logger.warning(
+            f"Note: the correct syntax for defining {field.name} is [[{field.name}]]. "
+            f"When you use [{field.name}], you will get an error if you try to define more "
+            f"than one of them. If you only have one of these sections, everything should "
+            f"work fine, but we recommend that you fix this nonetheless. If nothing else, "
+            f"it'll at least get rid of this annoying warning!"
+        )
+
+        return [value]
 
 
 # TODO: Maybe add some automation here, like automatically adding plurals
